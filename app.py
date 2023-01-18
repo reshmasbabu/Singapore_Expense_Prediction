@@ -8,7 +8,6 @@ from xgboost import XGBRegressor
 #from plotly import graph_objs as go
 #from sklearn.ensemble import RandomForestRegressor
 st.title("Singapore Expense Prediction ")
-columns = st.columns([1, 2, 1])
 
 def add_bg_from_url():
     st.markdown(
@@ -42,7 +41,7 @@ scaler = pickle.load(pickle_in)
 # Caching the model for faster loading
 #@st.cache
 
-data = pd.read_excel("data//Singapore_preprocessed.xlsx")
+#data = pd.read_excel("data//Singapore_preprocessed.xlsx")
 
 nav = st.sidebar.radio("Menu",["Home","Prediction","Popular Hotels","Sightseeing Attractions"])
 
@@ -68,8 +67,8 @@ if nav == "Popular Hotels":
         "Mandarin Orchard Singapore": "https://mandarin-orchard-hotel-singapore.hotel-ds.com/en/",
         "V Hotel Lavender": "https://vhotel.sg/v-hotel-lavender.shtml?gclid=Cj0KCQiA-oqdBhDfARIsAO0TrGFUXok4UotiIu20PVFFWrnHyPNJX7GX6HdX2g8Z93d-XyMmMrQmSUcaAnnDEALw_wcB&gclsrc=aw.ds",
         "York Hotel": "https://www.yorkhotel.com.sg/",
-        "Ibis Singapore on Bencoolen": "https://all.accor.com/hotel/6657/index.en.shtml",
-        "Marina Bay Sands Singapore": "https://www.visitsingapore.com/see-do-singapore/recreation-leisure/resorts/marina-bay-sands/",
+        "Ibis Singapore on Bencoolen": "https://www.holidify.com/hotels/ibis-hotels-in-SINGAPORE-8245.html",
+        "Marina Bay Sands Singapore": "https://www.holidify.com/hotel/a-1711.html",
         "The Elizabeth": "https://ar.trivago.com/en-145/oar/the-elizabeth-hotel-by-far-east-hospitality-singapore?tc=22&search=100-40920",
         "Royal Plaza": "https://www.royalplaza.com.sg/",
     }
@@ -161,7 +160,7 @@ if nav == "Prediction":
     elif stay == "Own Residence":
         value7 = 4
     elif stay == "Service apartment":
-        value8 = 5
+        value7 = 5
     else:
         value7 = 6
 
@@ -224,8 +223,10 @@ if nav == "Prediction":
     elif month == 'September':
         month = 9
     elif month == 'October':
-        month = 11
+        month = 10
     elif month == 'November':
+        month = 11
+    elif month == 'December':
         month = 12
 
     value11 = st.number_input("How much will be your expected baggage weight in pounds?")
@@ -240,21 +241,16 @@ if nav == "Prediction":
     #value12 = value12.reshape(1, -1)
     p=pd.DataFrame([value11,value12])
 
-    d = {'Weights_QTR': [value11], 'shopping_exp': [value12]}
-    df = pd.DataFrame(data=d)
+     #d = {'Weights_QTR': [value11], 'shopping_exp': [value12]}
+    #df = pd.DataFrame(data=d)
+    scale_data = np.array([value11, value12]).reshape(1, -1)
+    scaled = scaler.transform(scale_data)
+    Weights_QTR = scaled[0][0]
+    shopping_exp = scaled[0][1]
 
-    #data = np.concatenate((value11, value12))
-    #p = scaler.fit_transform(data)
-    #scaled = [value11, value12]
-    #scaled1 = np.vectorize(np.int_)
-    #x = np.array(list(map(np.int_, np.array(scaled))))
-    #q = [float(x) for x in scaled]
-    #r = [np.array(q)]
-    r = scaler.fit_transform(df)
-    print(r)
 
     # Create a list of input values
-    inputs = [value1, value2, value3, value4, value5, value6, value7, value8, value9, value10, month, r[0][0], r[0][1]]
+    inputs = [value1, value2, value3, value4, value5, value6, value7, value8, value9, value10, month, Weights_QTR, shopping_exp]
     init_features = [float(x) for x in inputs]
     final_features = [np.array(init_features)]
     pred = model.predict(final_features)
@@ -279,10 +275,10 @@ if nav == "Sightseeing Attractions":
 
     # Create a dictionary of hotel URLs
     places_urls = {
-        "Gardens by the Bay": "https://grant-associates.uk.com/projects/gardens-by-the-bay",
-        "Universal Studios Singapore": "https://www.pelago.co/en-SG/activity/pok40-rws-universal-studios-ticket-singapore/",
-        "Singapore Zoo": "https://www.kkday.com/en-sg/product/39249-wildlife-reserves-4-in-1-park-hopper-plus-ticket-singapore",
-        "Sentosa Island": "https://trevallog.com/sentosa-island-singapore/"
+        "Gardens by the Bay": "https://www.holidify.com/places/singapore/gardens-by-the-bay-sightseeing-11503.html",
+        "Universal Studios Singapore": "https://www.holidify.com/places/singapore/universal-studios-singapore-sightseeing-121008.html",
+        "Singapore Zoo": "https://www.holidify.com/places/singapore/the-singapore-zoo-sightseeing-11501.html",
+        "Sentosa Island": "https://www.holidify.com/places/singapore/sentosa-island-places-to-visit-area.html"
     }
 
     # Create a radio button for each hotel
